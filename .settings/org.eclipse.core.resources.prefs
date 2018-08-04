@@ -1,5 +1,8 @@
 eclipse.preferences.version=1
 encoding//config/UserInfo.py=utf-8
+encoding//service/MISReminder.py=utf-8
+encoding//service/MeetingReminder.py=utf-8
+encoding//util/DateUtil.py=utf-8
 encoding//util/EmailUtil.py=utf-8
 encoding//util/SMSUtil.py=utf-8
 encoding/main.py=utf-8

@@ -27,13 +27,15 @@ def isWorkDay(checkDate):
         result = urllib2.urlopen(req, urlparams)
         nowapi_call = result.readlines()
         nowapi_call = ','.join(nowapi_call)
-        #print content
+        print nowapi_call
         a_result = json.loads(nowapi_call)
         if a_result:
             if a_result['success'] != '0':
                 workmk = a_result['result']['workmk'];
                 if workmk == '1':
                     result = True;
+                else:
+                    result = False;
             else:
                 print a_result['msgid']+' '+a_result['msg']
         else:

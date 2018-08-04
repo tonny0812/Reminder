@@ -7,7 +7,7 @@ Created on 2018年8月1日
 
 import schedule
 from util.DateUtil import getCurrentDate, isWorkDay
-from util import EmailUtil, SMSUtil
+from util import EmailUtil, SMSUtil, DateUtil
 
 class MeetingReminder():
     def __init__(self,queue):
@@ -30,11 +30,13 @@ class MeetingReminder():
             EmailUtil.sendEmail(eReceivers, '主持早会', content)
             msg = "【主持早会】" + user['name'] +'(' + user['account'] +')' + '负责今天('+ getCurrentDate() +')早会';
             SMSUtil.sendSMS(tReceivers, msg)
-            print('--------order:' + str(user['order']), user['name'] +'(' + user['account'] +')' + '负责今天早会。。。')
+            r = '--------order:' + str(user['order']) + ' ' + user['name'] +'(' + user['account'] +')' + '负责今天('+ DateUtil.getCurrentDate() +')早会。。。'
+            print r
         self.userQueue.enQueue(user);
     
     def setSchdeule(self, job):
-        schedule.every().day.at("7:00").do(job);
+#         schedule.every().day.at("7:00").do(job);
+        schedule.every(10).seconds.do(job);
     
     def scheduleCheck(self):
         schedule.run_pending();

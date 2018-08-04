@@ -26,7 +26,8 @@ class MISReminder():
             EmailUtil.sendEmail(eReceivers, '巡检轮班', content)
             msg = "【巡检轮班】" + user['name'] +'(' + user['account'] +')' + '负责这周巡检';
             SMSUtil.sendSMS(tReceivers, msg)
-            print('--------order:' + str(user['order']), user['name'] +'(' + user['account'] +')' + '负责巡检。。。')
+            r = '--------order:' + str(user['order']) + ' ' + user['name'] +'(' + user['account'] +')' + u'负责巡检。。。';
+            print(r)
         self.userQueue.enQueue(user);
     
     def setSchdeule(self, job):
