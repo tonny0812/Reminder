@@ -212,5 +212,5 @@ local.properties
 .scala_dependencies
 .worksheet
 .idea/*
-/db/**.json
-/db/**.db
+**.json
+**.db
