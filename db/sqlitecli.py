@@ -8,6 +8,7 @@
 -------------------------------------------------
 """
 import json
+import os
 import sqlite3
 
 
@@ -21,11 +22,12 @@ import sqlite3
 #  db.execute("delete from student where id=? ", "id01")
 #  count = db.getCount("select * from student ")
 #  db.close()
-
-
 #
+
+DB_BASE_PATH = os.path.dirname(__file__) + "\\"
+
 class SqliteDataBase(object):
-    dbfile = "sqlite.db"
+    dbfile = DB_BASE_PATH + "sqlite.db"
     memory = ":memory:"
     conn = None
     showsql = True
@@ -278,11 +280,11 @@ class SqliteUserDB(SqliteDataBase):
 
     def query_meetinguser_by_account(self, account):
         query_sql = "select * from meetinguser where account = ?"
-        return self._executeQuery(query_sql, account)
+        return self.parseUsers(self._executeQuery(query_sql, account))
 
     def get_meetinguser_all(self):
         query_sql = "select * from meetinguser where 1=1"
-        return self._executeQuery(query_sql)
+        return self.parseUsers(self._executeQuery(query_sql))
 
     def get_meetinguser_all_count(self):
         query_sql = "select * from meetinguser where 1=1"
@@ -290,12 +292,20 @@ class SqliteUserDB(SqliteDataBase):
 
     def get_meetinguser_all_valid(self):
         query_sql = "select * from meetinguser where is_valid = 1"
-        return self._executeQuery(query_sql)
+        return self.parseUsers(self._executeQuery(query_sql))
 
     def get_meetinguser_all_count_valid(self):
         query_sql = "select * from meetinguser where is_valid = 1"
         return self._getCount(query_sql)
 
+    def parseUsers(self, o_users):
+        n_users = []
+        if o_users and len(o_users) > 0:
+            for o_user in o_users:
+                n_user = User(o_user['account'], o_user['name'], o_user['email'],o_user['tel'],o_user['order_n'])
+                n_user.isValid = o_user['is_valid']
+                n_users.append(n_user)
+        return n_users
 
 ################初始化####################
 def init():
@@ -304,6 +314,10 @@ def init():
     userdb.initMisUsers()
     userdb.close()
 
+def getAllMeetingUser():
+    userdb = SqliteUserDB()
+    return userdb.get_meetinguser_all()
 
 if __name__ == '__main__':
-    init()
+    users = getAllMeetingUser()
+    print(len(users))

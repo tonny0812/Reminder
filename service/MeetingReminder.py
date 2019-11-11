@@ -31,7 +31,7 @@ class MeetingReminder():
             msg = "【主持早会】" + user['name'] +'(' + user['account'] +')' + '负责今天('+ getCurrentDate() +')早会';
             SMSUtil.sendSMS(tReceivers, msg)
             r = '--------order:' + str(user['order']) + ' ' + user['name'] +'(' + user['account'] +')' + '负责今天('+ DateUtil.getCurrentDate() +')早会。。。'
-            print r
+            print(r)
         self.userQueue.enQueue(user);
     
     def setSchdeule(self, job):
