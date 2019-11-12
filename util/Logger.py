@@ -21,7 +21,6 @@ level_relations = {
 
 FMT = '%(asctime)s - %(levelname)s: %(message)s'
 
-
 class Logger():
 
     def __init__(self):
@@ -30,12 +29,10 @@ class Logger():
         self.logger.setLevel(level_relations.get(Config.LOG_LEVEL))  # 设置日志级别
         sh = logging.StreamHandler()  # 往屏幕上输出
         sh.setFormatter(format_str)  # 设置屏幕上显示的格式
-        # 实例化TimedRotatingFileHandler
-        th = handlers.TimedRotatingFileHandler(filename=Config.LOG_FILE_PATH,
-                                               encoding='utf-8')  # 往文件里写入#指定间隔时间自动生成文件的处理器
-        th.setFormatter(format_str)  # 设置文件里写入的格式
+        wh = handlers.WatchedFileHandler(filename=Config.LOG_FILE_PATH, encoding='utf-8')
+        wh.setFormatter(format_str)  # 设置文件里写入的格式
         self.logger.addHandler(sh)  # 把对象加到logger里
-        self.logger.addHandler(th)
+        self.logger.addHandler(wh)
 
     def debug(self, msg):
         if msg:

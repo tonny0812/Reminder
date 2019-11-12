@@ -21,8 +21,7 @@ sysManager = Manager()
 
 @app.route('/')
 def index():
-    userdb = SqliteUserDB()
-    meetingUsers = userdb.get_meetinguser_all()
+    meetingUsers = sysManager.getAllMeetingUsers()
     return render_template('index.html', meetingUsers=meetingUsers)
 
 
@@ -30,6 +29,7 @@ def index():
 def meetinguser():
     abled = request.form.get('abled')
     account = request.form.get('account')
+    sysManager.updateMeetingUsers(account, (True if abled=='true' else False))
     return jsonify(abled, account)
 
 

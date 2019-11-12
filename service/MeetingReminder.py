@@ -53,8 +53,8 @@ class MeetingReminder(object):
         self.userQueue.enQueue(user)
 
     def setSchdeule(self, job):
-        #         schedule.every().day.at("7:00").do(job)
-        schedule.every(10).seconds.do(job)
+        # schedule.every().day.at("7:00").do(job)
+        schedule.every(3).seconds.do(job)
 
     def scheduleCheck(self):
         schedule.run_pending()

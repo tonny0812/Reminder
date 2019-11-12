@@ -47,9 +47,9 @@ class SqliteDataBase(object):
     # 获取连接
     def _getConn(self):
         if (self.conn is None):
-            conn = sqlite3.connect(self.dbfile)
+            conn = sqlite3.connect(self.dbfile, check_same_thread=False)
             if (conn is None):
-                conn = sqlite3.connect(self.memory)
+                conn = sqlite3.connect(self.memory, check_same_thread=False)
             if (conn is None):
                 print("dbfile : " + self.dbfile + " is not found && the memory connect error ! ")
             else:

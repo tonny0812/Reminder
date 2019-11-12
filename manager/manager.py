@@ -62,6 +62,19 @@ class Manager(object):
     def getAllMeetingUsers(self):
         return self.__userdb.get_meetinguser_all()
 
+    def getAllActiveMeetingUsers(self):
+        return self.__userdb.get_meetinguser_all_valid()
+
+    def updateMeetingUsers(self, accout, active=True):
+        print(accout, active, (1 if active==True else 0))
+        if accout:
+            _user = self.__userdb.query_meetinguser_by_account(accout)[0]
+            if _user:
+                _user.isValid = (1 if active==True else 0)
+                self.__userdb.update_meetinguser(_user)
+        else:
+            print("更新失败！")
+
     def __rSortUsers(self, firstOrderUser, users):
         firstOrder = firstOrderUser.order
         size = len(users)
