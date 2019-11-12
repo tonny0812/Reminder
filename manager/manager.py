@@ -14,6 +14,9 @@ from db.sqlitecli import SqliteUserDB
 from service.MeetingReminder import MeetingReminder
 from service.Queue import Queue
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 class Manager(object):
     __meetingReminderProcess = None
@@ -23,37 +26,38 @@ class Manager(object):
     def startMeetingReminder(self, account):
         _firstUser = self.__userdb.query_meetinguser_by_account(account)[0]
         if _firstUser is None:
-            return False, "用户%s不存在！" % account
+            return False, u"用户%s不存在！" % account
         if _firstUser.isValid == 0:
-            return False, "用户%s不可用！" % account
+            return False, u"用户%s不可用！" % account
 
         _meetingUsers = self.__userdb.get_meetinguser_all_valid()
         _meetingUsers = self.__rSortUsers(_firstUser, _meetingUsers)
         _meetinUserQueue = self.__getUserQueue(_meetingUsers)
-        if self.__meetingReminderProcess is None:
-            self.__meetingReminderProcess = Process(target=self.__startMeetingReminderServer, args=(_meetinUserQueue,))
-            return True, "Meeting Reminder Start"
+        if self.__meetingReminderProcess is None or self.__meetingReminderProcess.is_alive() == False:
+            self.__meetingReminderProcess = Process(target=self._startMeetingReminderServer, args=(_meetinUserQueue,))
+            self.__meetingReminderProcess.start()
+            return True, u"Meeting Reminder Start"
         else:
-            return False, "Meeting Reminder is running"
+            return False, u"Meeting Reminder is running"
 
-    def __startMeetingReminderServer(self, meetinUserQueue):
+    def _startMeetingReminderServer(self, meetinUserQueue):
+        print("开始Meeting通知...")
         meetingReminder = MeetingReminder(meetinUserQueue)
         meetingReminder.setSchdeule(meetingReminder.job)
         self.__meetringReminderFlag = True
         while self.__meetringReminderFlag:
             meetingReminder.scheduleCheck()
-            print('##')
             time.sleep(1)
 
     def stopMeetringReminder(self):
         if self.__meetingReminderProcess and self.__meetingReminderProcess.is_alive():
-            print('stop meeting reminder processs!')
+            print("停止Meeting通知...")
             self.__meetringReminderFlag = False
             self.__meetingReminderProcess.terminate()
             self.__meetingReminderProcess.join(10)
-            return True, "Meeting Reminder is stopped"
+            return True, u"Meeting Reminder is stopped"
         else:
-            return False, "Meeting Reminder has stopped"
+            return False, u"Meeting Reminder has stopped"
 
     def getAllMeetingUsers(self):
         return self.__userdb.get_meetinguser_all()
@@ -76,4 +80,4 @@ class Manager(object):
 
 if __name__ == '__main__':
     sysManager = Manager()
-    sysManager.startMeetingReminder('yangfan05')
+    sysManager.startMeetingReminder('guodongqing')

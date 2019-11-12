@@ -11,7 +11,6 @@ import json
 import os
 import sqlite3
 
-
 #
 # 连接数据库帮助类
 # 链接：https://www.jb51.net/article/140903.htm
@@ -25,6 +24,7 @@ import sqlite3
 #
 
 DB_BASE_PATH = os.path.dirname(__file__) + "\\"
+
 
 class SqliteDataBase(object):
     dbfile = DB_BASE_PATH + "sqlite.db"
@@ -302,10 +302,11 @@ class SqliteUserDB(SqliteDataBase):
         n_users = []
         if o_users and len(o_users) > 0:
             for o_user in o_users:
-                n_user = User(o_user['account'], o_user['name'], o_user['email'],o_user['tel'],o_user['order_n'])
+                n_user = User(o_user['account'], o_user['name'], o_user['email'], o_user['tel'], o_user['order_n'])
                 n_user.isValid = o_user['is_valid']
                 n_users.append(n_user)
         return n_users
+
 
 ################初始化####################
 def init():
@@ -314,9 +315,11 @@ def init():
     userdb.initMisUsers()
     userdb.close()
 
+
 def getAllMeetingUser():
     userdb = SqliteUserDB()
     return userdb.get_meetinguser_all()
+
 
 if __name__ == '__main__':
     users = getAllMeetingUser()

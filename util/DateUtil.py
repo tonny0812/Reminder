@@ -27,7 +27,6 @@ def isWorkDay(checkDate):
         result = urllib2.urlopen(req, urlparams)
         nowapi_call = result.readlines()
         nowapi_call = ','.join(nowapi_call)
-        print nowapi_call
         a_result = json.loads(nowapi_call)
         if a_result:
             if a_result['success'] != '0':
@@ -39,7 +38,7 @@ def isWorkDay(checkDate):
             else:
                 print a_result['msgid']+' '+a_result['msg']
         else:
-            print '获取  nowapi 失败！';
+            print('获取  nowapi 失败！')
     return result;
 
 def getCurrentDate():
