@@ -1,37 +1,63 @@
-#encoding:utf-8
+# encoding:utf-8
 '''
 Created on 2018年8月1日
 
 @author: guodongqing
 '''
+import datetime
+import threading
 
 import schedule
 from util import EmailUtil, SMSUtil
+from util.DateUtil import isWorkDay, getCurrentDate
+from util.Logger import Logger
+
 
 class MISReminder():
-    def __init__(self,queue):
+    _logger = Logger.instance()
+
+    def __init__(self, queue):
         self.userQueue = queue
-        
+        self._lock = threading.Lock()
+
     def job(self):
-        self.sendMessage();
-    
-    def sendMessage(self):
-        user = self.userQueue.deQueue();
+        if isWorkDay(getCurrentDate()):
+            with self._lock:
+                user = self.userQueue.getHead();
+                self.sendMessage(user);
+        else:
+            today = datetime.now().weekday();
+            if today == 6:
+                with self._lock:
+                    user = self.userQueue.deQueue();
+                    self.userQueue.enQueue(user);
+            self._logger.info(getCurrentDate() + '是假日！');
+
+    def sendMessage(self, user):
+        _r = '--------order:%s---%s(%s)负责巡检------------' % (str(user.order), user.name, user.account,)
+        self._logger.info(_r)
         eReceivers = [];
         tReceivers = [];
         if user:
-            eReceivers.append(user['email']);
-            tReceivers.append(user['tel']);
-            content = user['name'] +'(' + user['account'] +')' + '负责这周巡检，访问地址：http://union.vip.58.com/bsp/index';
-            EmailUtil.sendEmail(eReceivers, '巡检轮班', content)
-            msg = "【巡检轮班】" + user['name'] +'(' + user['account'] +')' + '负责这周巡检';
-            SMSUtil.sendSMS(tReceivers, msg)
-            r = '--------order:' + str(user['order']) + ' ' + user['name'] +'(' + user['account'] +')' + u'负责巡检。。。';
-            print(r)
-        self.userQueue.enQueue(user);
-    
+            eReceivers.append(user.email);
+            tReceivers.append(user.tel);
+            try:
+                content = user.name + '(' + user.account + ')' + '负责这周巡检，访问地址：http://union.vip.58.com/bsp/index,并查看《HBG业绩加和校验结果通知》邮件,排除安居客增值2005和2009';
+                EmailUtil.sendEmail(eReceivers, '巡检轮班', content.encode("utf-8"))
+            except Exception as e:
+                self._logger.error("邮件失败，" + str(e))
+            try:
+                msg = "【巡检轮班】" + user.name + '(' + user.account + ')' + '负责这周巡检,并查看《HBG业绩加和校验结果通知》邮件,排除>安居客增值2005和2009'
+                SMSUtil.sendSMS(tReceivers, msg.encode("utf-8"))
+            except Exception as e:
+                self._logger.error("短信失败，" + str(e))
+                pass
+
+
+
     def setSchdeule(self, job):
-        schedule.every().monday.at("9:30").do(job);
-    
+        # schedule.every().day.at("10:00").do(job)
+        schedule.every(5).seconds.do(job)
+
     def scheduleCheck(self):
         schedule.run_pending();

@@ -10,6 +10,10 @@
 import json
 import os
 import sqlite3
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 #
 # 连接数据库帮助类
@@ -298,6 +302,42 @@ class SqliteUserDB(SqliteDataBase):
         query_sql = "select * from meetinguser where is_valid = 1"
         return self._getCount(query_sql)
 
+    ########
+
+    def update_misuser(self, user):
+        update_sql = "update misuser set tel = ?, email = ?, is_valid = ? where account = ?"
+        result = self._execute(update_sql, user.tel, user.email, user.isValid, user.account)
+
+    def disable_misuser(self, account):
+        update_sql = "update misuser set is_valid = 0 where account = ?"
+        result = self._execute(update_sql, account)
+
+    def able_misuser(self, account):
+        update_sql = "update misuser set is_valid = 1 where account = ?"
+        result = self._execute(update_sql, account)
+
+    def query_misuser_by_account(self, account):
+        query_sql = "select * from misuser where account = ?"
+        return self.parseUsers(self._executeQuery(query_sql, account))
+
+    def get_misuser_all(self):
+        query_sql = "select * from misuser where 1=1"
+        return self.parseUsers(self._executeQuery(query_sql))
+
+    def get_misuser_all_count(self):
+        query_sql = "select * from misuser where 1=1"
+        return self._getCount(query_sql)
+
+    def get_misuser_all_valid(self):
+        query_sql = "select * from misuser where is_valid = 1"
+        return self.parseUsers(self._executeQuery(query_sql))
+
+    def get_misuser_all_count_valid(self):
+        query_sql = "select * from misuser where is_valid = 1"
+        return self._getCount(query_sql)
+
+    ######
+
     def parseUsers(self, o_users):
         n_users = []
         if o_users and len(o_users) > 0:
@@ -322,5 +362,6 @@ def getAllMeetingUser():
 
 
 if __name__ == '__main__':
+    init()
     users = getAllMeetingUser()
     print(len(users))

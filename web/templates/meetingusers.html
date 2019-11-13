@@ -31,7 +31,7 @@
             <tbody>
             {% for user in meetingUsers %}
             <tr>
-                <td><input type="radio" name="s_user" value="{{user.account}}"></td>
+                <td><input type="radio" name="s_user" value="{{user.account}}" {% if user.isValid == 0 %} disabled {% endif %}></td>
                 <td>{{user.order}}</td>
                 <td>{{user.account}}</td>
                 <td>{{user.name}}</td>
@@ -71,7 +71,7 @@ $(function () {
             },
             function(data, status){
               console.log("数据：" + data + "\n状态：" + status);
-              
+
             }
         );
 

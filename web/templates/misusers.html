@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width"/>
+    <title>用户列表</title>
+    <!--@*1、Jquery组件引用*@-->
+    <script src="../static/js/jquery.min.js"></script>
+    <!--@*2、bootstrap组件引用*@-->
+    <script src="../static/bootstrap/bootstrap.js"></script>
+    <link href="../static/bootstrap/bootstrap.css" rel="stylesheet"/>
+    <!--@*3、bootstrap开关组件引用*@-->
+    <script src="../static/bootstrap-toggle/bootstrap4-toggle.min.js"></script>
+    <link href="../static/bootstrap-toggle/bootstrap4-toggle.min.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>序号</th>
+                <th>账号</th>
+                <th>姓名</th>
+                <th>邮箱</th>
+                <th>手机</th>
+                <th>有效性</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in misUsers %}
+            <tr>
+                <td><input type="radio" name="s_user" value="{{user.account}}"></td>
+                <td>{{user.order}}</td>
+                <td>{{user.account}}</td>
+                <td>{{user.name}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.tel}}</td>
+                <td>
+                    <input type="checkbox" {% if user.isValid == 1 %} checked {% endif %}
+                           value="{{user.account}}" data-toggle="toggle" data-onstyle="success" data-size="xs">
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="">
+        <button class="btn btn-primary" id="mis-start-bt">启动</button>
+        <button class="btn btn-primary" id="mis-stop-bt">停止</button>
+    </div>
+</div>
+<script>
+$(function () {
+    $("input[type='checkbox']").change(function() {
+        var _checked = $(this).prop('checked')
+        var _account = $(this).val()
+        var _radio = $('input[type="radio"][value="'+ _account +'"]');
+        _radio.prop('checked', false);
+        if(_checked) {
+            _radio.attr('disabled',false);
+        } else {
+            _radio.attr('disabled',true);
+        }
+
+        $.post("/mis/user",
+            {
+              abled:_checked,
+              account:_account
+            },
+            function(data, status){
+              console.log("数据：" + data + "\n状态：" + status);
+              
+            }
+        );
+
+    })
+
+    $("#mis-start-bt").click(function() {
+            var _select_account = $('input[type="radio"]:checked').val();
+            if(undefined == _select_account) {
+                alert("请选择开始人员")
+            } else {
+                console.log(_select_account);
+                $.post("/mis/start",
+                    {
+                      account:_select_account
+                    },
+                    function(data, status){
+                      console.log("数据：" + data + "\n状态：" + status);
+                    }
+                );
+            }
+    })
+
+    $("#mis-stop-bt").click(function() {
+        $.post("/mis/stop",
+            {},
+            function(data, status){
+              console.log("数据：" + data + "\n状态：" + status);
+            }
+        );
+    })
+
+});
+
+</script>
+</body>
+</html>

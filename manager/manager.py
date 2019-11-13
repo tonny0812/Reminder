@@ -7,21 +7,29 @@
    date：          2019/11/11
 -------------------------------------------------
 """
+import sys
+import threading
 import time
-from multiprocessing import Process
 
 from db.sqlitecli import SqliteUserDB
+from service.MISReminder import MISReminder
 from service.MeetingReminder import MeetingReminder
 from service.Queue import Queue
+from util.Logger import Logger
 
-import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+
 class Manager(object):
     __meetingReminderProcess = None
-    __meetringReminderFlag = True
+    __meetingReminderThread = None
+    __meetingReminderFlag = True
+    __misReminderProcess = None
+    __misReminderThread = None
+    __misReminderFlag = True
     __userdb = SqliteUserDB()
+    _logger = Logger.instance()
 
     def startMeetingReminder(self, account):
         _firstUser = self.__userdb.query_meetinguser_by_account(account)[0]
@@ -32,46 +40,96 @@ class Manager(object):
 
         _meetingUsers = self.__userdb.get_meetinguser_all_valid()
         _meetingUsers = self.__rSortUsers(_firstUser, _meetingUsers)
-        _meetinUserQueue = self.__getUserQueue(_meetingUsers)
-        if self.__meetingReminderProcess is None or self.__meetingReminderProcess.is_alive() == False:
-            self.__meetingReminderProcess = Process(target=self._startMeetingReminderServer, args=(_meetinUserQueue,))
-            self.__meetingReminderProcess.start()
+        _meetingUserQueue = self.__getUserQueue(_meetingUsers)
+        if self.__meetingReminderThread is None or self.__meetingReminderThread.is_alive() == False:
+            self.__meetingReminderThread = threading.Thread(name="meeting-thread",
+                                                            target=self._startMeetingReminderServer,
+                                                            args=(_meetingUserQueue,))
+            self.__meetingReminderThread.start()
             return True, u"Meeting Reminder Start"
         else:
             return False, u"Meeting Reminder is running"
 
+    def startMisReminder(self, account):
+        _firstUser = self.__userdb.query_misuser_by_account(account)[0]
+        if _firstUser is None:
+            return False, u"用户%s不存在！" % account
+        if _firstUser.isValid == 0:
+            return False, u"用户%s不可用！" % account
+
+        _misUsers = self.__userdb.get_misuser_all_valid()
+        _misUsers = self.__rSortUsers(_firstUser, _misUsers)
+        _misUserQueue = self.__getUserQueue(_misUsers)
+        if self.__misReminderThread is None or self.__misReminderThread.is_alive() == False:
+            self.__misReminderThread = threading.Thread(name="mis-thread", target=self._startMisReminderServer, args=(_misUserQueue,))
+            self.__misReminderThread.start()
+            return True, u"Mis Reminder Start"
+        else:
+            return False, u"Mis Reminder is running"
+
     def _startMeetingReminderServer(self, meetinUserQueue):
-        print("开始Meeting通知...")
+        self._logger.info("开始Meeting通知...")
         meetingReminder = MeetingReminder(meetinUserQueue)
         meetingReminder.setSchdeule(meetingReminder.job)
-        self.__meetringReminderFlag = True
-        while self.__meetringReminderFlag:
+        self.__meetingReminderFlag = True
+        while self.__meetingReminderFlag:
             meetingReminder.scheduleCheck()
             time.sleep(1)
 
-    def stopMeetringReminder(self):
-        if self.__meetingReminderProcess and self.__meetingReminderProcess.is_alive():
-            print("停止Meeting通知...")
-            self.__meetringReminderFlag = False
-            self.__meetingReminderProcess.terminate()
-            self.__meetingReminderProcess.join(10)
+    def _startMisReminderServer(self, misUserQueue):
+        self._logger.info("开始Mis通知...")
+        misReminder = MISReminder(misUserQueue)
+        misReminder.setSchdeule(misReminder.job)
+        self.__misReminderFlag = True
+        while self.__misReminderFlag:
+            misReminder.scheduleCheck()
+            time.sleep(1)
+
+    def stopMeetingReminder(self):
+        if self.__meetingReminderThread and self.__meetingReminderThread.is_alive():
+            self._logger.info("停止Meeting通知...")
+            self.__meetingReminderFlag = False
             return True, u"Meeting Reminder is stopped"
         else:
             return False, u"Meeting Reminder has stopped"
 
+    def stopMisReminder(self):
+        if self.__misReminderThread and self.__misReminderThread.is_alive():
+            self._logger.info("停止Mis通知...")
+            self.__misReminderFlag = False
+            return True, u"Mis Reminder is stopped"
+        else:
+            return False, u"Mis Reminder has stopped"
+
     def getAllMeetingUsers(self):
         return self.__userdb.get_meetinguser_all()
+
+    def getAllMisUsers(self):
+        return self.__userdb.get_misuser_all()
 
     def getAllActiveMeetingUsers(self):
         return self.__userdb.get_meetinguser_all_valid()
 
+    def getAllActiveMisUsers(self):
+        return self.__userdb.get_misuser_all_valid()
+
     def updateMeetingUsers(self, accout, active=True):
-        print(accout, active, (1 if active==True else 0))
+        print(accout, active, (1 if active == True else 0))
         if accout:
             _user = self.__userdb.query_meetinguser_by_account(accout)[0]
             if _user:
-                _user.isValid = (1 if active==True else 0)
+                _user.isValid = (1 if active == True else 0)
                 self.__userdb.update_meetinguser(_user)
+        else:
+            print("更新失败！")
+
+    def updateMisUsers(self, accout, active=True):
+        print(accout, active, (1 if active == True else 0))
+        if accout:
+            _user = self.__userdb.query_misuser_by_account(accout)[0]
+            if _user:
+                _user.isValid = (1 if active == True else 0)
+                self.__userdb.update_misuser(_user)
         else:
             print("更新失败！")
 
@@ -84,9 +142,9 @@ class Manager(object):
         users.sort(cmp=None, key=lambda x: x.order, reverse=False)
         return users
 
-    def __getUserQueue(self, meetingUsers):
-        queue = Queue(len(meetingUsers) + 1);
-        for user in meetingUsers:
+    def __getUserQueue(self, users):
+        queue = Queue(len(users) + 1);
+        for user in users:
             queue.enQueue(user);
         return queue
 
@@ -94,3 +152,4 @@ class Manager(object):
 if __name__ == '__main__':
     sysManager = Manager()
     sysManager.startMeetingReminder('guodongqing')
+    sysManager.startMisReminder('guodongqing')

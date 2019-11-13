@@ -16,4 +16,6 @@ LOG_FILE_PATH = LOG_DIR_PATH + "remind.log"
 
 # 'debug','info','warning','error','crit'
 LOG_LEVEL = 'info'
+LOGGER_NAME = 'reminderLogger'
+FMT = '%(asctime)s - %(levelname)s: %(message)s'
 
