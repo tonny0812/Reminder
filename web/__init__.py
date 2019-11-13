@@ -18,9 +18,12 @@ sysManager = Manager()
 app = Flask(__name__)
 
 
-def start_web_server(port=5000, debug=True):
+def start_web_server(port=5500, debug=True):
     app.run(port=port, debug=debug)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/meeting')
 def meeting():
@@ -48,6 +51,7 @@ def meetinguser():
 @app.route('/meeting/start', methods=['POST'])
 def meetingstart():
     account = request.form.get('account')
+    logger.info("早会-》》》%s" % account)
     status, msg = sysManager.startMeetingReminder(account)
     if status:
         logger.info(msg)
@@ -81,6 +85,7 @@ def misuser():
 @app.route('/mis/start', methods=['POST'])
 def misstart():
     account = request.form.get('account')
+    logger.info("巡检-》》》%s" % account)
     status, msg = sysManager.startMisReminder(account)
     if status:
         logger.info(msg)

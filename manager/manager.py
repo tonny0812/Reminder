@@ -22,14 +22,13 @@ sys.setdefaultencoding('utf-8')
 
 
 class Manager(object):
-    __meetingReminderProcess = None
     __meetingReminderThread = None
     __meetingReminderFlag = True
-    __misReminderProcess = None
     __misReminderThread = None
     __misReminderFlag = True
     __userdb = SqliteUserDB()
     _logger = Logger.instance()
+    _meetingUserQueue = None
 
     def startMeetingReminder(self, account):
         _firstUser = self.__userdb.query_meetinguser_by_account(account)[0]
@@ -40,11 +39,12 @@ class Manager(object):
 
         _meetingUsers = self.__userdb.get_meetinguser_all_valid()
         _meetingUsers = self.__rSortUsers(_firstUser, _meetingUsers)
-        _meetingUserQueue = self.__getUserQueue(_meetingUsers)
+        self._meetingUserQueue = self.__getUserQueue(_meetingUsers)
         if self.__meetingReminderThread is None or self.__meetingReminderThread.is_alive() == False:
+            self.__meetingReminderThread = None
             self.__meetingReminderThread = threading.Thread(name="meeting-thread",
                                                             target=self._startMeetingReminderServer,
-                                                            args=(_meetingUserQueue,))
+                                                            args=(self._meetingUserQueue,))
             self.__meetingReminderThread.start()
             return True, u"Meeting Reminder Start"
         else:
@@ -61,6 +61,7 @@ class Manager(object):
         _misUsers = self.__rSortUsers(_firstUser, _misUsers)
         _misUserQueue = self.__getUserQueue(_misUsers)
         if self.__misReminderThread is None or self.__misReminderThread.is_alive() == False:
+            self.__misReminderThread = None
             self.__misReminderThread = threading.Thread(name="mis-thread", target=self._startMisReminderServer, args=(_misUserQueue,))
             self.__misReminderThread.start()
             return True, u"Mis Reminder Start"
@@ -75,6 +76,8 @@ class Manager(object):
         while self.__meetingReminderFlag:
             meetingReminder.scheduleCheck()
             time.sleep(1)
+        self._logger.info("Meeting通知结束...")
+        return
 
     def _startMisReminderServer(self, misUserQueue):
         self._logger.info("开始Mis通知...")
@@ -84,6 +87,8 @@ class Manager(object):
         while self.__misReminderFlag:
             misReminder.scheduleCheck()
             time.sleep(1)
+        self._logger.info("Mis通知结束...")
+        return
 
     def stopMeetingReminder(self):
         if self.__meetingReminderThread and self.__meetingReminderThread.is_alive():
@@ -133,6 +138,7 @@ class Manager(object):
         else:
             print("更新失败！")
 
+    @classmethod
     def __rSortUsers(self, firstOrderUser, users):
         firstOrder = firstOrderUser.order
         size = len(users)
@@ -142,11 +148,12 @@ class Manager(object):
         users.sort(cmp=None, key=lambda x: x.order, reverse=False)
         return users
 
+    @classmethod
     def __getUserQueue(self, users):
-        queue = Queue(len(users) + 1);
+        _queue = Queue(len(users) + 1);
         for user in users:
-            queue.enQueue(user);
-        return queue
+            _queue.enQueue(user);
+        return _queue
 
 
 if __name__ == '__main__':

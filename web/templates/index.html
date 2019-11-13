@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width"/>
+    <title>通知</title>
+    <!--@*1、Jquery组件引用*@-->
+    <script src="../static/js/jquery.min.js"></script>
+    <!--@*2、bootstrap组件引用*@-->
+    <script src="../static/bootstrap/bootstrap.js"></script>
+    <link href="../static/bootstrap/bootstrap.css" rel="stylesheet"/>
+    <link href="../static/font-awesome-4.7.0/css/font-awesome.css" rel="stylesheet"/>
+
+    <script src="../static/iframetabs/iframetabs.js"></script>
+    <link href="../static/iframetabs/iframetabs.css" rel="stylesheet"/>
+
+</head>
+<body>
+<div class="container">
+    <div id="wrapper">
+        <ul id="tabs">
+            <li class='current'><a class='tab' id='pages' href='#'>All Pages</a></li>
+        </ul>
+     <div id="content">
+         <div id="pages_content" class="tabdata">
+             <ol>
+                 <li><a href="/meeting" class="tablink" data-lockothers="true">早会</a></li>
+                 <li><a href="/mis" class="tablink">巡检</a></li>
+             </ol>
+         </div>
+         </div>
+     </div>
+</div>
+<script type="text/javascript">
+     $(document).ready(function(){
+        bindTabLinks();
+     });
+</script>
+</body>
+</html>
