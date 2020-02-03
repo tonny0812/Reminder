@@ -179,8 +179,8 @@ class User(object):
 
 class SqliteUserDB(SqliteDataBase):
     def __init__(self):
-        self.meeting_user_path = os.path.join(DB_BASE_PATH,'meetinguser.json')
-        self.mis_user_path = os.path.join(DB_BASE_PATH,'misuser.json')
+        self.meeting_user_path = os.path.join(DB_BASE_PATH, "meetinguser.json")
+        self.mis_user_path = os.path.join(DB_BASE_PATH, "misuser.json")
 
     def __del__(self):
         self.close()
