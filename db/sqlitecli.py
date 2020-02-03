@@ -27,7 +27,7 @@ sys.setdefaultencoding('utf-8')
 #  db.close()
 #
 
-DB_BASE_PATH = os.path.dirname(__file__) + "\\"
+DB_BASE_PATH = os.path.dirname(__file__) + "/"
 
 
 class SqliteDataBase(object):
