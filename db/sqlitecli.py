@@ -352,7 +352,7 @@ class SqliteUserDB(SqliteDataBase):
 def init():
     userdb = SqliteUserDB()
     userdb.initMeetingUsers()
-    # userdb.initMisUsers()
+    userdb.initMisUsers()
     userdb.close()
 
 
@@ -366,7 +366,7 @@ def getAllMISUser():
 
 
 if __name__ == '__main__':
-    # init()
+    init()
     users = getAllMISUser()
     for user in users:
         print(user.account, user.email, user.tel)
