@@ -11,11 +11,11 @@ import sys
 import threading
 import time
 
-from db.sqlitecli import SqliteUserDB
 from service.MISReminder import MISReminder
 from service.MeetingReminder import MeetingReminder
 from service.Queue import Queue
 from util.Logger import Logger
+from db.sqlitecli import SqliteUserDB
 
 reload(sys)
 sys.setdefaultencoding('utf-8')

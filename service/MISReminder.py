@@ -63,6 +63,7 @@ class MISReminder():
 
     def setSchdeule(self, job):
         # schedule.every().day.at("10:00").do(job)
+        # schedule.every().day.at("14:00").do(job)
         schedule.every(5).seconds.do(job)
 
     def scheduleCheck(self):
