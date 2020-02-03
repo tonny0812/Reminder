@@ -44,6 +44,7 @@ class MISReminder():
             _r2 = '--------email:%s---tel:%s------------' % (str(user.email), user.tel)
             self._logger.info(_r2)
             eReceivers.append(user.email);
+            eReceivers.append('lijian02@58.com')
             tReceivers.append(user.tel);
             try:
                 content = user.name + '(' + user.account + ')' + '负责巡检，访问地址：<a href="http://union.vip.58.com/bsp/index">http://union.vip.58.com/bsp/index</a>,并查看《HBG业绩加和校验结果通知》邮件';
