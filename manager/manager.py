@@ -11,6 +11,8 @@ import sys
 import threading
 import time
 
+sys.path.append("..")
+
 from service.MISReminder import MISReminder
 from service.MeetingReminder import MeetingReminder
 from service.Queue import Queue
@@ -19,7 +21,6 @@ from db.sqlitecli import SqliteUserDB
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-sys.path.append("..")
 
 
 class Manager(object):
