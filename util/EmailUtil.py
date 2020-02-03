@@ -24,7 +24,7 @@ def sendEmail(receivers, subject, content):
             msg['From'] = senderInfo['address'];
             msg['To'] = ','.join(receivers);
             msg['Subject'] = subject;
-            msg.attach(MIMEText(content, 'plain', 'utf-8'));
+            msg.attach(MIMEText(content, 'html', 'utf-8'));
 
             server = smtplib.SMTP(senderInfo['host'], senderInfo['port']);
             server.starttls();

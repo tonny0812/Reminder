@@ -342,7 +342,7 @@ class SqliteUserDB(SqliteDataBase):
         n_users = []
         if o_users and len(o_users) > 0:
             for o_user in o_users:
-                n_user = User(o_user['account'], o_user['name'], o_user['email'], o_user['tel'], o_user['order_n'])
+                n_user = User(o_user['account'], o_user['name'], o_user['tel'], o_user['email'], o_user['order_n'])
                 n_user.isValid = o_user['is_valid']
                 n_users.append(n_user)
         return n_users
@@ -352,7 +352,7 @@ class SqliteUserDB(SqliteDataBase):
 def init():
     userdb = SqliteUserDB()
     userdb.initMeetingUsers()
-    userdb.initMisUsers()
+    # userdb.initMisUsers()
     userdb.close()
 
 
@@ -360,8 +360,13 @@ def getAllMeetingUser():
     userdb = SqliteUserDB()
     return userdb.get_meetinguser_all()
 
+def getAllMISUser():
+    userdb = SqliteUserDB()
+    return userdb.get_misuser_all()
+
 
 if __name__ == '__main__':
-    init()
-    users = getAllMeetingUser()
-    print(len(users))
+    # init()
+    users = getAllMISUser()
+    for user in users:
+        print(user.account, user.email, user.tel)

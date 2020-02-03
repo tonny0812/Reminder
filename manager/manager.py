@@ -158,5 +158,5 @@ class Manager(object):
 
 if __name__ == '__main__':
     sysManager = Manager()
-    sysManager.startMeetingReminder('guodongqing')
+    # sysManager.startMeetingReminder('guodongqing')
     sysManager.startMisReminder('guodongqing')

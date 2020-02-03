@@ -11,6 +11,7 @@ import schedule
 from util import EmailUtil, SMSUtil
 from util.DateUtil import isWorkDay, getCurrentDate
 from util.Logger import Logger
+from service import email_content
 
 
 class MISReminder():
@@ -38,17 +39,22 @@ class MISReminder():
         self._logger.info(_r)
         eReceivers = [];
         tReceivers = [];
+
         if user:
+            _r2 = '--------email:%s---tel:%s------------' % (str(user.email), user.tel)
+            self._logger.info(_r2)
             eReceivers.append(user.email);
             tReceivers.append(user.tel);
             try:
-                content = user.name + '(' + user.account + ')' + '负责这周巡检，访问地址：http://union.vip.58.com/bsp/index,并查看《HBG业绩加和校验结果通知》邮件,排除安居客增值2005和2009';
+                content = user.name + '(' + user.account + ')' + '负责巡检，访问地址：<a href="http://union.vip.58.com/bsp/index">http://union.vip.58.com/bsp/index</a>,并查看《HBG业绩加和校验结果通知》邮件';
+                content += '<br/>'
+                content += email_content
                 EmailUtil.sendEmail(eReceivers, '巡检轮班', content.encode("utf-8"))
             except Exception as e:
                 self._logger.error("邮件失败，" + str(e))
             try:
                 msg = "【巡检轮班】" + user.name + '(' + user.account + ')' + '负责这周巡检,并查看《HBG业绩加和校验结果通知》邮件,排除>安居客增值2005和2009'
-                SMSUtil.sendSMS(tReceivers, msg.encode("utf-8"))
+                # SMSUtil.sendSMS(tReceivers, msg.encode("utf-8"))
             except Exception as e:
                 self._logger.error("短信失败，" + str(e))
                 pass
