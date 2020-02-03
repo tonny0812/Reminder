@@ -19,6 +19,7 @@ from db.sqlitecli import SqliteUserDB
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
+sys.path.append("..")
 
 
 class Manager(object):
