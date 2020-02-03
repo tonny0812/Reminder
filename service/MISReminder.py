@@ -53,7 +53,7 @@ class MISReminder():
             except Exception as e:
                 self._logger.error("邮件失败，" + str(e))
             try:
-                msg = "【巡检轮班】" + user.name + '(' + user.account + ')' + '负责这周巡检,并查看《HBG业绩加和校验结果通知》邮件,排除>安居客增值2005和2009'
+                msg = "【巡检轮班】" + user.name + '(' + user.account + ')' + '负责这周巡检,并查看《HBG业绩加和校验结果通知》邮件'
                 SMSUtil.sendSMS(tReceivers, msg.encode("utf-8"))
             except Exception as e:
                 self._logger.error("短信失败，" + str(e))
