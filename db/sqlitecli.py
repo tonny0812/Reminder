@@ -31,7 +31,8 @@ DB_BASE_PATH = os.path.dirname(__file__) + "/"
 
 
 class SqliteDataBase(object):
-    dbfile = DB_BASE_PATH + "sqlite.db"
+    dbfile = os.path.join(DB_BASE_PATH, "sqlite.db")
+    print(dbfile)
     memory = ":memory:"
     conn = None
     showsql = True
