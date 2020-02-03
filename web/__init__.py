@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 
 def start_web_server(port=5500, debug=True):
-    app.run(port=port, debug=debug)
+    app.run(host='0.0.0.0', port=port, debug=debug)
 
 @app.route('/')
 def index():
