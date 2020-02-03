@@ -22,17 +22,25 @@ class MISReminder():
         self._lock = threading.Lock()
 
     def job(self):
+        # if isWorkDay(getCurrentDate()):
+        #     with self._lock:
+        #         user = self.userQueue.getHead();
+        #         self.sendMessage(user);
+        # else:
+        #     today = datetime.now().weekday();
+        #     if today == 6:
+        #         with self._lock:
+        #             user = self.userQueue.deQueue();
+        #             self.userQueue.enQueue(user);
+        #     self._logger.info(getCurrentDate() + '是假日！');
         if isWorkDay(getCurrentDate()):
             with self._lock:
-                user = self.userQueue.getHead();
-                self.sendMessage(user);
+                user = self.userQueue.deQueue()
+                self.sendMessage(user)
+                self.userQueue.enQueue(user)
         else:
-            today = datetime.now().weekday();
-            if today == 6:
-                with self._lock:
-                    user = self.userQueue.deQueue();
-                    self.userQueue.enQueue(user);
-            self._logger.info(getCurrentDate() + '是假日！');
+            self._logger.info(getCurrentDate() + '是假日！')
+            pass
 
     def sendMessage(self, user):
         _r = '--------order:%s---%s(%s)负责巡检------------' % (str(user.order), user.name, user.account,)
